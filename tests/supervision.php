@@ -34,7 +34,7 @@ $failLogger = function (string $msg) use (&$failLogs): void {
 $supervisedFail = new SupervisedPaymentGateway($stripeGateway, $failLogger);
 
 $tests->throws(
-    fn () => $supervisedFail->charge(-10.0),
+    fn() => $supervisedFail->charge(-10.0),
     RuntimeException::class,
     'Invalid amount',
     'Supervised gateway propagates payment exception'
@@ -60,3 +60,4 @@ $tests->same('payfast_ref_pf_99', $payfastTx, 'Supervised PayFast returns correc
 $tests->true(str_contains($payfastLogs[1], 'SUPERVISION [PAYMENT SUCCESS]'), 'PayFast logs SUCCESS');
 
 $tests->summary();
+
