@@ -10,10 +10,14 @@ final class BookingService
     /** @var BookingConfirmationListenerInterface[] */
     private array $confirmationListeners;
 
+    /** @var BookingRepositoryInterface */
+    private BookingRepositoryInterface $bookingRepository;
+
     public function __construct(
         private readonly ?PricingService $pricingService = null,
         ?array $paymentGateways = null,
-        ?array $confirmationListeners = null
+        ?array $confirmationListeners = null,
+        ?BookingRepositoryInterface $bookingRepository = null
     ) {
         $this->paymentGateways = $paymentGateways ?? [
             'stripe' => new SupervisedPaymentGateway(new StripePaymentGateway()),
@@ -25,6 +29,7 @@ final class BookingService
             new AnalyticsTrackingListener(),
             new SmsNotificationListener(),
         ];
+        $this->bookingRepository = $bookingRepository ?? new SqlSimulationBookingRepository();
     }
 
     private function getPricingService(): PricingService
@@ -50,7 +55,7 @@ final class BookingService
 
         $booking->status = 'confirmed';
 
-        echo "SQL INSERT booking={$booking->id} total={$total} status={$booking->status}" . PHP_EOL;
+        $this->bookingRepository->save($booking, $total);
 
         foreach ($this->confirmationListeners as $listener) {
             $listener->onBookingConfirmed($booking, $total);

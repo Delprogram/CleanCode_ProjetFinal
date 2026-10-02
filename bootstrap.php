@@ -23,5 +23,7 @@ require_once __DIR__ . '/src/EmailConfirmationListener.php';
 require_once __DIR__ . '/src/LoyaltyPointsListener.php';
 require_once __DIR__ . '/src/AnalyticsTrackingListener.php';
 require_once __DIR__ . '/src/SmsNotificationListener.php';
+require_once __DIR__ . '/src/BookingRepositoryInterface.php';
+require_once __DIR__ . '/src/SqlSimulationBookingRepository.php';
 require_once __DIR__ . '/src/BookingService.php';
 
