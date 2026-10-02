@@ -75,15 +75,10 @@ $tests->throws(
     'zero or negative quantity throws RuntimeException'
 );
 
-$tests->throws(
-    function () use ($service) {
-        $booking = createBooking();
-        $service->confirm($booking, 'payfast');
-    },
-    RuntimeException::class,
-    'PayFast not implemented',
-    'payfast currently throws not implemented'
-);
+$payFastBooking = createBooking();
+$payFastTotal = $service->confirm($payFastBooking, 'payfast');
+$tests->near(50.0, $payFastTotal, 'payfast payment confirms booking successfully');
+$tests->same('confirmed', $payFastBooking->status, 'payfast booking becomes confirmed');
 
 $tests->throws(
     function () use ($service) {

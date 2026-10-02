@@ -4,9 +4,17 @@ declare(strict_types=1);
 
 final class BookingService
 {
+    /** @var array<string, PaymentGatewayInterface> */
+    private array $paymentGateways;
+
     public function __construct(
-        private readonly ?PricingService $pricingService = null
+        private readonly ?PricingService $pricingService = null,
+        ?array $paymentGateways = null
     ) {
+        $this->paymentGateways = $paymentGateways ?? [
+            'stripe' => new StripePaymentGateway(),
+            'payfast' => new PayFastAdapter(),
+        ];
     }
 
     private function getPricingService(): PricingService
@@ -26,15 +34,9 @@ final class BookingService
 
         $total = $this->getPricingService()->calculate($booking);
 
-        if ($paymentMethod === 'stripe') {
-            $stripe = new StripeClient();
-            $transactionId = $stripe->charge($total);
-            echo "PAYMENT {$transactionId}" . PHP_EOL;
-        } elseif ($paymentMethod === 'payfast') {
-            throw new RuntimeException('PayFast not implemented');
-        } else {
-            throw new RuntimeException('Unknown payment method');
-        }
+        $gateway = $this->paymentGateways[$paymentMethod] ?? throw new RuntimeException('Unknown payment method');
+        $transactionId = $gateway->charge($total, (string) $booking->id);
+        echo "PAYMENT {$transactionId}" . PHP_EOL;
 
         $booking->status = 'confirmed';
 
