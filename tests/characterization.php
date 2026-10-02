@@ -35,12 +35,12 @@ $tests->near(90.0, $vipTotal, 'legacy VIP rule gives 10 percent discount');
 
 $threeDays = createBooking('standard', '3days', 60.0, 2);
 $threeDaysTotal = $service->confirm($threeDays, 'stripe');
-$tests->near(110.0, $threeDaysTotal, 'legacy three day pass discount is 10 euros');
+$tests->near(100.0, $threeDaysTotal, 'new policy three day pass discount is 20 euros');
 
-// Règle combinée VIP + 3days : remise 10% puis déduction de 10 euros
+// Règle combinée VIP + 3days : remise 10% puis déduction de 20 euros
 $vipThreeDays = createBooking('vip', '3days', 100.0, 1);
 $vipThreeDaysTotal = $service->confirm($vipThreeDays, 'stripe');
-$tests->near(80.0, $vipThreeDaysTotal, 'legacy VIP + 3 days applies 10% then minus 10 euros');
+$tests->near(70.0, $vipThreeDaysTotal, 'new policy VIP + 3 days applies 10% then minus 20 euros');
 
 // Sécurisation des cas d'erreur métier
 $tests->throws(
