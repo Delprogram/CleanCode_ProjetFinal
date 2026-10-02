@@ -13,6 +13,7 @@ require_once __DIR__ . '/src/StripePaymentGateway.php';
 require_once __DIR__ . '/src/PayFastAdapter.php';
 require_once __DIR__ . '/src/EmailService.php';
 require_once __DIR__ . '/src/SmsClient.php';
+require_once __DIR__ . '/src/SupervisedPaymentGateway.php';
 require_once __DIR__ . '/src/LoyaltyService.php';
 require_once __DIR__ . '/src/AnalyticsClient.php';
 require_once __DIR__ . '/src/PricingService.php';
