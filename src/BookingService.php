@@ -12,8 +12,8 @@ final class BookingService
         ?array $paymentGateways = null
     ) {
         $this->paymentGateways = $paymentGateways ?? [
-            'stripe' => new StripePaymentGateway(),
-            'payfast' => new PayFastAdapter(),
+            'stripe' => new SupervisedPaymentGateway(new StripePaymentGateway()),
+            'payfast' => new SupervisedPaymentGateway(new PayFastAdapter()),
         ];
     }
 
