@@ -37,5 +37,63 @@ $threeDays = createBooking('standard', '3days', 60.0, 2);
 $threeDaysTotal = $service->confirm($threeDays, 'stripe');
 $tests->near(110.0, $threeDaysTotal, 'legacy three day pass discount is 10 euros');
 
+// Règle combinée VIP + 3days : remise 10% puis déduction de 10 euros
+$vipThreeDays = createBooking('vip', '3days', 100.0, 1);
+$vipThreeDaysTotal = $service->confirm($vipThreeDays, 'stripe');
+$tests->near(80.0, $vipThreeDaysTotal, 'legacy VIP + 3 days applies 10% then minus 10 euros');
+
+// Sécurisation des cas d'erreur métier
+$tests->throws(
+    function () use ($service) {
+        $empty = new Booking(2, new Customer(2, 'empty@example.com'));
+        $service->confirm($empty, 'stripe');
+    },
+    RuntimeException::class,
+    'Empty booking',
+    'empty booking throws RuntimeException'
+);
+
+$tests->throws(
+    function () use ($service) {
+        $badEmail = new Booking(3, new Customer(3, 'not-an-email'));
+        $badEmail->addItem(new BookingItem(new Ticket('T1', 'Test', 10.0), 1));
+        $service->confirm($badEmail, 'stripe');
+    },
+    RuntimeException::class,
+    'Invalid email',
+    'invalid customer email throws RuntimeException'
+);
+
+$tests->throws(
+    function () use ($service) {
+        $badQty = new Booking(4, new Customer(4, 'valid@example.com'));
+        $badQty->addItem(new BookingItem(new Ticket('T1', 'Test', 10.0), 0));
+        $service->confirm($badQty, 'stripe');
+    },
+    RuntimeException::class,
+    'Invalid quantity',
+    'zero or negative quantity throws RuntimeException'
+);
+
+$tests->throws(
+    function () use ($service) {
+        $booking = createBooking();
+        $service->confirm($booking, 'payfast');
+    },
+    RuntimeException::class,
+    'PayFast not implemented',
+    'payfast currently throws not implemented'
+);
+
+$tests->throws(
+    function () use ($service) {
+        $booking = createBooking();
+        $service->confirm($booking, 'unknown_method');
+    },
+    RuntimeException::class,
+    'Unknown payment method',
+    'unknown payment method throws RuntimeException'
+);
+
 ob_end_clean();
 $tests->summary();
