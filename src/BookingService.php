@@ -7,13 +7,23 @@ final class BookingService
     /** @var array<string, PaymentGatewayInterface> */
     private array $paymentGateways;
 
+    /** @var BookingConfirmationListenerInterface[] */
+    private array $confirmationListeners;
+
     public function __construct(
         private readonly ?PricingService $pricingService = null,
-        ?array $paymentGateways = null
+        ?array $paymentGateways = null,
+        ?array $confirmationListeners = null
     ) {
         $this->paymentGateways = $paymentGateways ?? [
             'stripe' => new SupervisedPaymentGateway(new StripePaymentGateway()),
             'payfast' => new SupervisedPaymentGateway(new PayFastAdapter()),
+        ];
+        $this->confirmationListeners = $confirmationListeners ?? [
+            new EmailConfirmationListener(),
+            new LoyaltyPointsListener(),
+            new AnalyticsTrackingListener(),
+            new SmsNotificationListener(),
         ];
     }
 
@@ -42,8 +52,9 @@ final class BookingService
 
         echo "SQL INSERT booking={$booking->id} total={$total} status={$booking->status}" . PHP_EOL;
 
-        $emailService = new EmailService();
-        $emailService->sendConfirmation($booking->customer->email, $booking->id);
+        foreach ($this->confirmationListeners as $listener) {
+            $listener->onBookingConfirmed($booking, $total);
+        }
 
         return $total;
     }

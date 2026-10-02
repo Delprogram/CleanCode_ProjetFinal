@@ -14,8 +14,14 @@ require_once __DIR__ . '/src/PayFastAdapter.php';
 require_once __DIR__ . '/src/SupervisedPaymentGateway.php';
 require_once __DIR__ . '/src/EmailService.php';
 require_once __DIR__ . '/src/SmsClient.php';
-require_once __DIR__ . '/src/SupervisedPaymentGateway.php';
+
 require_once __DIR__ . '/src/LoyaltyService.php';
 require_once __DIR__ . '/src/AnalyticsClient.php';
 require_once __DIR__ . '/src/PricingService.php';
+require_once __DIR__ . '/src/BookingConfirmationListenerInterface.php';
+require_once __DIR__ . '/src/EmailConfirmationListener.php';
+require_once __DIR__ . '/src/LoyaltyPointsListener.php';
+require_once __DIR__ . '/src/AnalyticsTrackingListener.php';
+require_once __DIR__ . '/src/SmsNotificationListener.php';
 require_once __DIR__ . '/src/BookingService.php';
+
